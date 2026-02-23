@@ -1,56 +1,15 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template
 import random
-temp_history = []
+import os
 
 app = Flask(__name__)
 
-# Device states
-light_status = "OFF"
-fan_status = "OFF"
+@app.route("/")
+def home():
+    temperature = random.randint(20, 35)
+    humidity = random.randint(30, 70)
+    return render_template("index.html", temp=temperature, hum=humidity)
 
-temp_history = []
-
-@app.route('/')
-def index():
-    global temp_history
-
-    temp = random.randint(20, 35)
-
-    temp_history.append(temp)
-
-    if len(temp_history) > 10:
-        temp_history.pop(0)
-
-    return render_template("index.html",
-                           temp=temp,
-                           light=light_status,
-                           fan=fan_status,
-                           temps=temp_history)
-
-
-@app.route('/light_on')
-def light_on():
-    global light_status
-    light_status = "ON"
-    return redirect(url_for('home'))
-
-@app.route('/light_off')
-def light_off():
-    global light_status
-    light_status = "OFF"
-    return redirect(url_for('home'))
-
-@app.route('/fan_on')
-def fan_on():
-    global fan_status
-    fan_status = "ON"
-    return redirect(url_for('home'))
-
-@app.route('/fan_off')
-def fan_off():
-    global fan_status
-    fan_status = "OFF"
-    return redirect(url_for('home'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
